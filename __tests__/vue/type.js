@@ -18,7 +18,7 @@ describe("userEvent.type", () => {
   it.each(["input", "textarea"])("should type text in <%s>", type => {
     const input = jest.fn();
 
-    const { getByTestId } = renderComponent(type, { input });
+    const { getByTestId } = renderComponent(type, { input }, { maxLength: -1 });
 
     const text = "Hello, world!";
     userEvent.type(getByTestId("input"), text);
@@ -134,7 +134,11 @@ describe("userEvent.type", () => {
     type => {
       const input = jest.fn();
 
-      const { getByTestId } = renderComponent(type, { input });
+      const { getByTestId } = renderComponent(
+        type,
+        { input },
+        { maxLength: -1 }
+      );
       const text = "Hello, world!";
 
       userEvent.type(getByTestId("input"), text, {
@@ -143,6 +147,42 @@ describe("userEvent.type", () => {
 
       expect(getByTestId("input")).toHaveProperty("value", text);
       expect(input).toHaveBeenCalledTimes(1);
+    }
+  );
+
+  it.each(["input", "textarea"])(
+    "includes entire text with negative maxlength in <%s>",
+    type => {
+      const input = jest.fn();
+
+      const { getByTestId } = renderComponent(
+        type,
+        { input },
+        { maxLength: -1 }
+      );
+
+      const text = "Hello, world!";
+      userEvent.type(getByTestId("input"), text);
+      expect(input).toHaveBeenCalledTimes(text.length);
+      expect(getByTestId("input")).toHaveProperty("value", text);
+    }
+  );
+
+  it.each(["input", "textarea"])(
+    "adds no text with 0 maxlength in <%s>",
+    type => {
+      const input = jest.fn();
+
+      const { getByTestId } = renderComponent(
+        type,
+        { input },
+        { maxLength: 0 }
+      );
+
+      const text = "Hello, world!";
+      userEvent.type(getByTestId("input"), text);
+      expect(input).toHaveBeenCalledTimes(0);
+      expect(getByTestId("input")).toHaveProperty("value", "");
     }
   );
 

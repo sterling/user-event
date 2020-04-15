@@ -11,7 +11,8 @@ describe("userEvent.type", () => {
     const { getByTestId } = render(
       React.createElement(type, {
         "data-testid": "input",
-        onChange: onChange
+        onChange: onChange,
+        maxLength: -1
       })
     );
     const text = "Hello, world!";
@@ -145,7 +146,8 @@ describe("userEvent.type", () => {
       const { getByTestId } = render(
         React.createElement(type, {
           "data-testid": "input",
-          onChange: onChange
+          onChange: onChange,
+          maxLength: -1
         })
       );
       const text = "Hello, world!";
@@ -155,6 +157,42 @@ describe("userEvent.type", () => {
 
       expect(onChange).toHaveBeenCalledTimes(1);
       expect(getByTestId("input")).toHaveProperty("value", text);
+    }
+  );
+
+  it.each(["input", "textarea"])(
+    "includes entire text with negative maxlength in <%s>",
+    type => {
+      const onChange = jest.fn();
+      const { getByTestId } = render(
+        React.createElement(type, {
+          "data-testid": "input",
+          onChange: onChange,
+          maxLength: -1
+        })
+      );
+      const text = "Hello, world!";
+      userEvent.type(getByTestId("input"), text);
+      expect(onChange).toHaveBeenCalledTimes(text.length);
+      expect(getByTestId("input")).toHaveProperty("value", text);
+    }
+  );
+
+  it.each(["input", "textarea"])(
+    "adds no text with 0 maxlength in <%s>",
+    type => {
+      const onChange = jest.fn();
+      const { getByTestId } = render(
+        React.createElement(type, {
+          "data-testid": "input",
+          onChange: onChange,
+          maxLength: 0
+        })
+      );
+      const text = "Hello, world!";
+      userEvent.type(getByTestId("input"), text);
+      expect(onChange).toHaveBeenCalledTimes(0);
+      expect(getByTestId("input")).toHaveProperty("value", "");
     }
   );
 
